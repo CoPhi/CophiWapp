@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ilc="http://java.sun.com/jsf/composite/ilccomp">
+<h:head>
+	<title><ui:insert name="title">Default title</ui:insert></title>
+	<link rel="stylesheet" type="text/css" href="jquery.cleditor.css" />
+	<script type="text/javascript" src="js/base64v1_0.js" />
+	<script type="text/javascript" src="js/jquery.ilc.editor.js" />
+	<script type="text/javascript" src="js/resource.js" />
+	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+</h:head>
+
+<h:body id="content">
+	<p:growl id="growl" widgetVar="growlr" showDetail="true" life="3000" />
+	<p:blockUI widgetVar="blockUI" block="content">
+		<b>Caricamento</b>
+		<img src="images/ajax-loader.gif" />
+	</p:blockUI>
+
+	<h:form>
+		<p:inplace id="teInplace" effectSpeed="fast" editor="true">
+			<p:ajax event="save" partialSubmit="true" update="@this"
+				onstart="blockUI.show()"
+				oncomplete="blockUI.hide(); onEditorComplete($(document.getElementById('#{p:component('teInplace')}')), #{p:widgetVar('teEditor')}, doAsYouType); flashNew();"></p:ajax>
+			<p:ajax event="cancel" partialSubmit="true" update="@this"
+				onstart="return confirm('Vuoi veramente scartare le modifiche?')"
+				oncomplete="onEditorComplete($(document.getElementById('#{p:component('teInplace')}')), #{p:widgetVar('teEditor')}, doAsYouType)"></p:ajax>
+			<p:editor id="teEditor"
+				controls="bold italic glossary Asutype removeformat | cut copy paste pastetext | undo redo"
+				value="#{pericopeEditorController.greekText}">
+			</p:editor>
+			<script>
+				$(document).ready(function() {
+				onEditorReady('#{p:component('teInplace')}', #{p:widgetVar('teEditor')}, doAsYouType);
+				});
+					</script>
+		</p:inplace>
+	</h:form>
+	<h:form>
+		<p:remoteCommand name="doAsYouType" partialSubmit="true"
+			immediate="true" oncomplete="handleAsYouType(xhr, status, args)"
+			action="#{pericopeEditorController.asYouType}" />
+	</h:form>
+</h:body>
+
+</html>
